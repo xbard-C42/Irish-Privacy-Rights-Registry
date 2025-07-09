@@ -50,6 +50,8 @@ We're not creating new obligations - we're creating a **due diligence standard**
 
 ---
 
+![Screenshot](./banner.png)
+
 ## 💥 **Key Features That Change Everything**
 
 ### 🛡️ **Anti-Doxxing Protection**
@@ -118,7 +120,7 @@ We're not creating new obligations - we're creating a **due diligence standard**
 
 ---
 
-## 🎯 **Political Value for Green Party**
+## 🎯 **Political Value**
 
 ### **Immediate Wins**
 - **🛡️ Victim Protection** - prevents stalking/harassment
