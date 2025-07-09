@@ -288,7 +288,7 @@ GET /v1/transparency/global
 
 ## 📜 **License & Legal**
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+See the [LICENSE](LICENSE) file for details.
 
 **Legal Framework:** This registry operates within existing GDPR/CCPA frameworks by creating a due diligence standard that makes privacy violations legally indefensible.
 
