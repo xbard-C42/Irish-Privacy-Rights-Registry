@@ -1,0 +1,211 @@
+# Privacy Rights Registry - CI/CD Pipeline
+# Continuous Integration and Deployment for Irish Government Infrastructure
+
+name: Privacy Rights Registry CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  # Security scanning
+  security:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run Trivy vulnerability scanner
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        format: 'sarif'
+        output: 'trivy-results.sarif'
+    
+    - name: Upload Trivy scan results
+      uses: github/codeql-action/upload-sarif@v2
+      with:
+        sarif_file: 'trivy-results.sarif'
+
+  # Code quality and testing
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_privacy_registry
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+    
+    - name: Run code formatting check
+      run: |
+        black --check .
+        flake8 .
+    
+    - name: Run type checking
+      run: |
+        mypy .
+    
+    - name: Run tests
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_privacy_registry
+        REDIS_URL: redis://localhost:6379
+        SECRET_KEY: test-secret-key
+      run: |
+        pytest --cov=. --cov-report=xml
+    
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        file: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
+
+  # Frontend testing
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    
+    - name: Install frontend dependencies
+      run: |
+        npm install
+        npm install -g typescript
+    
+    - name: Run frontend tests
+      run: |
+        npm run test
+        npm run build
+
+  # Build and push Docker image
+  build:
+    needs: [security, test, frontend]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+    
+    - name: Login to DockerHub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKERHUB_USERNAME }}
+        password: ${{ secrets.DOCKERHUB_TOKEN }}
+    
+    - name: Build and push
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        platforms: linux/amd64,linux/arm64
+        push: true
+        tags: |
+          xbard/privacy-rights-registry:latest
+          xbard/privacy-rights-registry:${{ github.sha }}
+    
+    - name: Image digest
+      run: echo ${{ steps.docker_build.outputs.digest }}
+
+  # Deploy to staging (for Green Party testing)
+  deploy-staging:
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+    
+    steps:
+    - name: Deploy to staging
+      run: |
+        echo "Deploying to Green Party staging environment..."
+        # Add deployment commands here
+    
+    - name: Run smoke tests
+      run: |
+        echo "Running smoke tests on staging..."
+        # Add smoke tests here
+
+  # Deploy to production (Irish Government)
+  deploy-production:
+    needs: [build]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    environment: production
+    
+    steps:
+    - name: Deploy to production
+      run: |
+        echo "Deploying to Irish Government production environment..."
+        # Add production deployment commands here
+    
+    - name: Health check
+      run: |
+        echo "Running production health checks..."
+        # Add health check commands here
+    
+    - name: Notify Green Party
+      run: |
+        echo "Notifying Green Party of successful deployment..."
+        # Add notification commands here
+
+  # Generate compliance report
+  compliance:
+    needs: [test]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Generate GDPR compliance report
+      run: |
+        echo "Generating GDPR compliance documentation..."
+        # Add compliance report generation
+    
+    - name: Upload compliance artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: compliance-report
+        path: compliance/

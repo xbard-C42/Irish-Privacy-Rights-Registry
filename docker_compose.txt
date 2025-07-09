@@ -1,0 +1,116 @@
+# Privacy Rights Registry - Docker Compose Configuration
+# Production-ready deployment for Irish government infrastructure
+
+version: '3.8'
+
+services:
+  # Main API service
+  api:
+    build: .
+    container_name: privacy-registry-api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://privacy:${DB_PASSWORD:-privacy}@db:5432/privacy_registry
+      - REDIS_URL=redis://redis:6379
+      - SECRET_KEY=${SECRET_KEY:-change-this-in-production}
+      - ENVIRONMENT=production
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-https://privacy-registry.ireland.ie}
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./logs:/app/logs
+      - ./data:/app/data
+    restart: unless-stopped
+    networks:
+      - privacy-network
+
+  # PostgreSQL database
+  db:
+    image: postgres:15
+    container_name: privacy-registry-db
+    environment:
+      - POSTGRES_DB=privacy_registry
+      - POSTGRES_USER=privacy
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-privacy}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init_db.sql:/docker-entrypoint-initdb.d/init_db.sql
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - privacy-network
+
+  # Redis for rate limiting and caching
+  redis:
+    image: redis:7-alpine
+    container_name: privacy-registry-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    restart: unless-stopped
+    networks:
+      - privacy-network
+
+  # Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: privacy-registry-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+      - ./static:/usr/share/nginx/html/static
+    depends_on:
+      - api
+    restart: unless-stopped
+    networks:
+      - privacy-network
+
+  # Monitoring with Prometheus (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: privacy-registry-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    networks:
+      - privacy-network
+
+  # Grafana for monitoring dashboards (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: privacy-registry-grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+    networks:
+      - privacy-network
+
+volumes:
+  postgres_data:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+
+networks:
+  privacy-network:
+    driver: bridge

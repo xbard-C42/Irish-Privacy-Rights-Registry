@@ -1,0 +1,81 @@
+{
+  "name": "privacy-rights-registry-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Irish Privacy Rights Registry - preventing stalking and doxxing",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "privacy",
+    "rights",
+    "registry",
+    "irish",
+    "government",
+    "gdpr",
+    "anti-doxxing",
+    "stalking-prevention"
+  ],
+  "author": {
+    "name": "Matthew Cummins",
+    "email": "xbard@protonmail.com",
+    "location": "Edgeworthstown, Co. Longford, Ireland"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xbard-C42/privacy-rights-registry"
+  },
+  "bugs": {
+    "url": "https://github.com/xbard-C42/privacy-rights-registry/issues"
+  },
+  "homepage": "https://github.com/xbard-C42/privacy-rights-registry#readme",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "next": "^14.0.0",
+    "typescript": "^5.2.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "tailwindcss": "^3.3.0",
+    "lucide-react": "^0.263.1",
+    "clsx": "^2.0.0",
+    "class-variance-authority": "^0.7.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/user-event": "^14.4.3",
+    "jest": "^29.0.0",
+    "jest-environment-jsdom": "^29.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^14.0.0",
+    "prettier": "^3.0.0",
+    "postcss": "^8.0.0",
+    "autoprefixer": "^10.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

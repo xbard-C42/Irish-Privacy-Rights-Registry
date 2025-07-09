@@ -1,0 +1,39 @@
+# Privacy Rights Registry - Python Dependencies
+# Production-ready FastAPI application with security hardening
+
+# Core FastAPI and server
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Database and ORM
+sqlalchemy==2.0.23
+alembic==1.12.1
+psycopg2-binary==2.9.9
+
+# Authentication and security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+
+# Validation and configuration
+pydantic[email]==2.5.0
+python-dotenv==1.0.0
+
+# Rate limiting and caching
+slowapi==0.1.9
+redis==5.0.1
+
+# Logging and monitoring
+loguru==0.7.2
+
+# Development and testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.2
+black==23.11.0
+flake8==6.1.0
+mypy==1.7.1
+
+# Documentation
+mkdocs==1.5.3
+mkdocs-material==9.4.8
