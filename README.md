@@ -142,7 +142,7 @@ We're not creating new obligations - we're creating a **due diligence standard**
 - [x] **Security hardening**
 - [x] **Anti-doxxing protection**
 - [x] **Complete testing suite**
-- [ ] **Green Party adoption**
+- [ ] **Political Party adoption**
 - [ ] **Irish government hosting**
 - [ ] **Public deployment**
 
