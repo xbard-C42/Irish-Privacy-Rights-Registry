@@ -278,7 +278,7 @@ GET /v1/transparency/global
 
 ## 🏆 **Ready for Recognition & Media**
 
-- **🎯 Green Party Adoption** - Awaiting political championship
+- **🎯 Political Party Adoption** - Awaiting political championship
 - **🇮🇪 Irish Government** - Ready for digital sovereignty initiative  
 - **🇪🇺 EU Privacy Leadership** - First-mover advantage available
 - **🌍 Global Privacy Standard** - Ready for international adoption
